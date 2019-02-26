@@ -4,9 +4,13 @@
 #include <cstdint>
 #include <math.h>
 #include <vector>
+#include <fstream>
+#include <iostream>
 
 #include "Set.h"
 #include "Block.h"
+
+using namespace std;
 
 namespace G 
 {
@@ -14,6 +18,7 @@ struct mem_address {
 	int64_t address;
 	
 };
+
 class Cache {
 
 	private:
@@ -27,13 +32,17 @@ class Cache {
 		int sets;
 		int offset;
 		int index;
+		int tag;
 		
 	public:
 		/*Constructor and Destructor*/
-		Cache(int& C, int&b, int&N);
+		Cache(double& C, double& b, double& N);
+		Cache(int& C, int& b, int& N);
 		~Cache();
 		
 		void createCache();
+		void readConfig();
+		
 		
 		
 	//Cache(cache_size, block_size, set_assoc, replacement_policy);	//{constructor of the cache class}
