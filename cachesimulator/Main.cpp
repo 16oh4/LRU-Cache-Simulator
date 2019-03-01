@@ -1,6 +1,4 @@
 #include <iostream>
-//#include <fstream>
-#include <sstream>
 #include <stdint.h>
 #include <vector>
 
@@ -56,95 +54,47 @@ unsigned char* bytes(unsigned int &a)
 void readConfig() {
 	
 }
+
 int main(int argc, char** argv) 
 {
-	uint64_t memadr;
-	unsigned int H;
-	
-	vector<unsigned int> memory;
-	vector<unsigned char> membyte;
-	unsigned char* memarray;
-	
-//	string test = "0x9032BFAB";
-//	H = stoul(test, nullptr, 0);
-//	cout << hex << H << endl;
-	
-//	unsigned int test = 0x9032BFAB;
-	unsigned int test = 0x7E801111;
-	membyte = memBytes(test);
-	cout << "SIZE: " << membyte.size() << endl;
-	for(int i=0;i<4;i++)
-	{
-		cout << membyte.at(i) << endl;
-		
-	}
-	
-	memarray = bytes(test);
-	cout << (unsigned int)*memarray << endl;
-	
-	
-	
+	/*VARIABLE DECLARATIONS*/
 	ifstream file;
 	string line;
 	size_t found;
 	int c,b,n;
 	
+	/*FLUSH COUT*/
+	cout << flush;
+	cout.flush();
+	cout << dec;
 	
+	/*Begin configuration file read*/
 	file.open("example.cfg", ios::in);
 	
 	if (file.is_open())
 	{
+		/*READ FIRST CONFIG LINE - CACHE SIZE */
 		getline(file,line);
-//		cout << line << endl;
 		found = line.find("=");
-//		cout << line.substr(found+1, line.length()) << endl;
+		c = stoi(line.substr(found+1, line.length()),nullptr,0);
 		
-		c = stoi(line.substr(found+1, line.length()),nullptr,16);
-		cout << c << endl;
-		
+		/*READ SECOND CONFIG LINE - BLOCK SIZE */
 		getline(file, line);
 		found = line.find("=");
-		b = stoi(line.substr(found+1, line.length()),nullptr,16);
+		b = stoi(line.substr(found+1, line.length()),nullptr,0);
 		
+		/*READ Third Config Line - ASSOCIATIVITY*/
 		getline(file, line);
 		found = line.find("=");
-		n = stoi(line.substr(found+1, line.length()),nullptr,16);
-		
-		
-		cout << b << endl;
-		cout << n << endl;
+		n = stoi(line.substr(found+1, line.length()),nullptr,0);
+
 	}
 	
-	
-	
-	
-	//			for(int i=0; i<10; i++)
-//			{
-//	//			getline(file,line);
-//	//			memory.push_back(stoul(line, nullptr, 0));
-//	//			cout << hex << memory.at(i) << endl;
-//				
-//	
-//			}
-
-	double cap = (double) c;
-	double blocks = (double) b;
-	double assoc = (double) n;
-	
-//	Cache file_cache(cap,blocks,assoc);
+	/*Instantiate cache class with config file params*/
 	Cache cache2(c,b,n);
-
+	cache2.readMemory();
 	
 	file.close();
-	
-	delete memarray;
+
 	return 0;
 }
-
-//vector<unsigned char> intToBytes(int paramInt)
-//{
-//	vector<unsigned char> arrayOfByte(4);
-//	for (int i = 0; i < 4; i++)
-//		arrayOfByte[3 - i] = (paramInt >> (i * 8));
-//	return arrayOfByte;
-//}
