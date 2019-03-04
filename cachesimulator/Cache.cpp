@@ -77,16 +77,37 @@ namespace G
 
 		}
 		
+		pair<bits,mem_address*> insertion; //for inserting into hashmap
+		
 		/*BEGIN CACHE OPERATION*/
-		for(int i=0; i<2; i++)
+		int i=0;
+		for(; i<memoryLength; i++)
 		{
-			cout << "Checking" << endl;
-			printMemAdr(bank[i]);
+//			cout << "__________________Checking______________" << endl;
+			
+//			printMemAdr(bank[i]);
+			
+//			insertion = make_pair(bank[i].tag, &bank[i]);
+//			
+//			mapCache.insert(insertion);
+//			
+//			cout << "MEM INSERTED: " <<mapCache.at(insertion.first)->mem << endl;
+//			checkEntry(bank[i].tag);
 			checkEntry(bank[i]);
+//			cout << "________END CHECKING____________________" << endl;
 		}
 		
+		cout << "NUM ACCESSES " << i << endl;
+		cout << "HITS: " << hits << endl;
+		cout << "MISSES: " << misses << endl;
+		cout << "HIT RATE: " << (double)(hits)/(double)(i) << endl;
+		
+		
 	}
-	
+	void Cache::checkEntry(bits& tag)
+	{
+		
+	}
 	void Cache::printMemAdr(mem_address& adr)
 	{
 		cout << "MEM:\t" << adr.mem <<
@@ -94,101 +115,239 @@ namespace G
 				"\nINDEX:\t" << adr.index << 
 				"\nOFFSET:\t" << adr.offset << endl;
 	}
+	
 	void Cache::checkEntry(mem_address& adr)
 	{
-		cout << "IN CHECK ENTRY" << endl;
-		int currentIndex = bitsToInt(adr.index);	//grab our current set index from the cache
+		int currentIndex 					= bitsToInt(adr.index);			//grab our current set index from the cache
 
-		list<entry>* currentSet = &setVector.at(currentIndex); //for easier code
+		list<tagentry>* currentSet 			= &tagCache.at(currentIndex); 	//make a pointer for the set an n index
 		
-		list<entry>::iterator* currentIt = &it.at(currentIndex);
-		//need iterator for operations
-		list<entry>::iterator search;
+		list<tagentry>::iterator* currentIt = &tagIt.at(currentIndex);		//iterator for the nth set
 		
+		list<tagentry>::iterator search;
 		
-		cout << "INDEX: " << currentIndex << endl;
-		cout << "Set vector size: " << setVector.size() << endl; 
-	
+//		cout << "Set size: " << currentSet->size() << endl;
 		
+		*currentIt = find(currentSet->begin(), currentSet->end(), adr.tag);	//search for the tag in the set at n index
 		
-//		mem_address* G = &adr;
-		
-		
-		
-		/*Search for the memory address in the list*/
-		*currentIt = find(currentSet->begin(), currentSet->end(), &adr);
-		
-		
-		
-		cout << "CURRENT SET SIZE: " << currentSet->size() << endl;
-		
-		
-		/*IF cache misses and the set is full, then replace LRU*/
-		if((*currentIt == currentSet->end()) && (currentSet->size() == assoc))
+		/*Cache FULL*/
+		if(currentSet->size() == assoc)
 		{
-			cout << "Conflict Miss" << endl;
-			misses++;		//increment misses
+			/*Cache MISS*/
+			if( (*currentIt == currentSet->end()) )
+			{
+//				cout << "------->MISS, will replace at LRU" << endl;
+				misses++;
+				
+				*currentIt = currentSet->begin();	//set iterator pointer to LRU
+				currentSet->erase(*currentIt);		//erase LRU
+				currentSet->push_back(adr.tag);		//push back the tag as the new MRU
+				
+				/*Calculate position for iterator*/
+				*currentIt = currentSet->begin();
+				advance(*currentIt, distance(*currentIt, currentSet->end())-1); //advance to the last placement
+				
+//				cout << "Pushed " << **currentIt << endl;
+				
+	//			cout << "PUSHED IN: " <<  << endl;
+			}
 			
-//			/*Reset set iterator to beginning, then increment 1 to replace LRU*/
-//			(*currentIt) = currentSet->begin();	//increment currentIt to keep track of LRU
-//			(*currentIt)++;
-			
-			
-			
-			search = currentSet->begin(); 	//put iterator to begin for delete
-			deleteMemEntry((*search));		//delete mem_address pointer 
-			
-			currentSet->erase(search);		//delete entry in the list
-			currentSet->push_front(&adr);	//push mem_address to the front
-			
-			search = currentSet->begin();	//restore iterator to new LRU, same as = currentIt
-			*currentIt = search;
-			
-			cout << "After cache miss: " << (**currentIt)->tag << endl;
-			cout << "After cache miss: " << (*search)->tag << endl;
-//			cout << (**currentIt)->mem << endl;	//** because iterator is a ptr, and to deref its another *
-			
+			/*Cache HIT*/
+			else
+			{
+//				cout << "------->ITS A HIT!!!" << endl;
+				hits++;
+				
+				currentSet->erase(*currentIt);
+				
+				currentSet->push_back(adr.tag);
+				
+				/*Calculate position for iterator*/
+				*currentIt = currentSet->begin();
+				advance(*currentIt, distance(*currentIt, currentSet->end())-1); //advance to the last placement
+				
+//				cout << "Pushed " << **currentIt << endl;
+				
+			}
 		}
-		/*Cache miss but we have an empty set: COMPULSORY MISS*/
-		else if(*currentIt == currentSet->end())
+		/*Cache NOT FULL*/
+		else if ( (currentSet->size() != 0) && (currentSet->size() < assoc))
 		{
-			cout << "Compulsory Miss " << endl;
+			/*Cache MISS*/
+			if( (*currentIt == currentSet->end()) )
+			{
+//				cout << "------->Compulsory Miss GG" << endl;
+				misses++;
+				
+				currentSet->push_back(adr.tag);
+				
+				/*Calculate position for iterator*/
+				*currentIt = currentSet->begin();
+				advance(*currentIt, distance(*currentIt, currentSet->end())-1); //advance to the last placement
+				
+				
+				
+//				cout << "Pushed " << **currentIt << endl; //print the inserted tag
+			}
+			/*Cache HIT*/
+			else
+			{
+//				cout << "------->Cache hit, not empty" << endl;
+				hits++;
+				
+				currentSet->erase(*currentIt);	//erase spot to move to MRU now
+
+				currentSet->push_back(adr.tag);
+//				*currentIt = currentSet->end();	//set iterator to the MRU position
+				
+//				cout << "Pushed " << **currentIt << endl; //print the inserted tag
+				
+			}
+		}
+		/*Cache NEW*/
+		else if( (currentSet->size() == 0) && (*currentIt == currentSet->end()) )
+		{
+//			cout << "------->Compulsory Miss" << endl;
 			misses++;
 			
-			currentSet->push_front(&adr);
-			*currentIt = currentSet->begin();
+			currentSet->push_back(adr.tag);		//append to the back (MRU)
+			*currentIt = currentSet->begin();	//set iterator to this position since set is NEW
 			
-			cout << "After compulsory miss: " << ((**currentIt))->tag << endl;
-			
-			
+//			cout << "Pushed " << **currentIt << endl; //print the inserted tag
+//				printMemAdr(adr);
 		}
-		else if(*currentIt != currentSet->end())
+		
+		
+		/*Check if iterator does not point to the same tag*/
+		if( (**currentIt) != adr.tag)
 		{
-			cout << "Cache hit " << endl;
+			cout << "ERROR @ " << currentIndex << " mem:" << endl;
+			printMemAdr(adr);
+			printSet(*currentSet);
+			exit(0);
 		}
 		
-		printSet(*currentSet);
 		
+//		cout << "SET #: " << currentIndex << "\tSIZE: " << currentSet->size() << endl;
+//		cout << "MISSES: " << misses << "\tHITS: " << hits << endl;
 		
-		
-		
-		/*Here, pointers are set to null because they are automatically managed by the vector and list classes*/
+
+//		printSet(*currentSet);
+
 		currentSet = nullptr;
 		currentIt = nullptr;
-		
-		/*Just delete our empty pointers now*/
 		delete currentSet;
-		delete currentIt;
 		
-		/*This would throw exit codes if delete was before setting to null ptr*/
+		
+		delete currentIt;
 	}
 	
-	void Cache::printSet(list<entry>& l)
+	
+//	void Cache::checkEntry(mem_address& adr)
+//	{
+//		cout << "IN CHECK ENTRY" << endl;
+//		int currentIndex = bitsToInt(adr.index);	//grab our current set index from the cache
+//
+//		list<entry>* currentSet = &setVector.at(currentIndex); //for easier code
+//		
+//		list<entry>::iterator* currentIt = &it.at(currentIndex);
+//		//need iterator for operations
+//		list<entry>::iterator search;
+//		
+//		
+//		cout << "INDEX: " << currentIndex << endl;
+//		cout << "Set vector size: " << setVector.size() << endl; 
+//	
+//		
+//		
+////		mem_address* G = &adr;
+//		
+//		
+//		
+//		/*Search for the memory address in the list*/
+//		*currentIt = find(currentSet->begin(), currentSet->end(), &adr);
+//		
+//		
+//		
+//		cout << "CURRENT SET SIZE: " << currentSet->size() << endl;
+//		
+//		
+//		/*IF cache misses and the set is full, then replace LRU*/
+//		if((*currentIt == currentSet->end()) && (currentSet->size() == assoc))
+//		{
+//			cout << "Conflict Miss" << endl;
+//			misses++;		//increment misses
+//			
+////			/*Reset set iterator to beginning, then increment 1 to replace LRU*/
+////			(*currentIt) = currentSet->begin();	//increment currentIt to keep track of LRU
+////			(*currentIt)++;
+//			
+//			
+//			
+//			search = currentSet->begin(); 	//put iterator to begin for delete
+//			deleteMemEntry((*search));		//delete mem_address pointer 
+//			
+//			currentSet->erase(search);		//delete entry in the list
+//			currentSet->push_front(&adr);	//push mem_address to the front
+//			
+//			search = currentSet->begin();	//restore iterator to new LRU, same as = currentIt
+//			*currentIt = search;
+//			
+//			cout << "After cache miss: " << (**currentIt)->tag << endl;
+//			cout << "After cache miss: " << (*search)->tag << endl;
+////			cout << (**currentIt)->mem << endl;	//** because iterator is a ptr, and to deref its another *
+//			
+//		}
+//		/*Cache miss but we have an empty set: COMPULSORY MISS*/
+//		else if(*currentIt == currentSet->end())
+//		{
+//			cout << "Compulsory Miss " << endl;
+//			misses++;
+//			
+//			currentSet->push_front(&adr);
+//			*currentIt = currentSet->begin();
+//			
+//			cout << "After compulsory miss: " << ((**currentIt))->tag << endl;
+//			
+//			
+//		}
+//		else if(*currentIt != currentSet->end())
+//		{
+//			cout << "Cache hit " << endl;
+//		}
+//		
+//		printSet(*currentSet);
+//		
+//		
+//		
+//		
+//		/*Here, pointers are set to null because they are automatically managed by the vector and list classes*/
+//		currentSet = nullptr;
+//		currentIt = nullptr;
+//		
+//		/*Just delete our empty pointers now*/
+//		delete currentSet;
+//		delete currentIt;
+//		
+//		/*This would throw exit codes if delete was before setting to null ptr*/
+//	}
+	
+//	void Cache::printSet(list<entry>& l)
+//	{
+//		int i=0;
+//		for(list<entry>::iterator j= l.begin(); j != l.end(); j++)
+//		{
+//			cout << "Index: " << i << "\t" << (*j)->mem << endl;
+//		}
+//	}
+	
+	void Cache::printSet(list<tagentry>& l)
 	{
 		int i=0;
-		for(list<entry>::iterator j= l.begin(); j != l.end(); j++)
+		for(list<tagentry>::iterator j= l.begin(); j != l.end(); j++)
 		{
-			cout << "Index: " << i << "\t" << (*j)->mem << endl;
+			cout << "Index: " << i << " " << *j << endl;
+			i++;
 		}
 	}
 	
@@ -211,15 +370,17 @@ namespace G
 		hits		= 0;
 		misses		= 0;
 
-		setVector.resize(sets);	//allocate n sets for the vector length
-		it.resize(sets);			//allocate n iterators for each 
+//		setVector.resize(sets);	//allocate n sets for the vector length
+//		it.resize(sets);			//allocate n iterators for each 
 		tagCache.resize(sets);
+		tagIt.resize(sets);
 //		setVector.at(0)
 		
 		/*Initialize all iterators to their respective set's begin*/
-		for(int i=0; i<it.size(); i++)
+		for(int i=0; i<sets; i++)
 		{
-			it.at(i) = setVector.at(i).begin();
+//			it.at(i) = setVector.at(i).begin();
+			tagIt.at(i) = tagCache.at(i).begin();
 		}
 	}
 	

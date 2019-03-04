@@ -57,9 +57,12 @@ class Cache {
 		/*LRU Implementation*/
 		int blocksfilled;
 
-		vector<list<entry>> setVector;
-		vector<list<entry>::iterator> it;
+//		vector<list<entry>> setVector;
+//		vector<list<entry>::iterator> it;
 		vector<list<tagentry>> tagCache;
+		
+		vector<list<tagentry>::iterator> tagIt;
+		unordered_map<bits, mem_address*> mapCache;
 		
 		/*Cache storage*/
 		vector<bits> memory;		//Stores the entire memory from example.trc
@@ -92,6 +95,8 @@ class Cache {
 		void deleteMemEntry(mem_address*& adr);
 		void printMemAdr(mem_address& adr);
 		void printSet(list<entry>& l);
+		void checkEntry(bits& tag);
+		void printSet(list<tagentry>& l);
 		
 	public:
 		/*Constructor and Destructor*/
