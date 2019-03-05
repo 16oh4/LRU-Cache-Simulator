@@ -8,7 +8,8 @@ Compile with g++ using c++11 with the following command:
 g++ -std=c++11 Cache.cpp main.cpp  -o hw
 ./hw 
 
-Sample Run: (Memory sizes are in bytes)
+Sample Runs: (Memory sizes are in bytes)
+
 Cache Size=32768
 Block Size=64
 Associativity=4
