@@ -1,8 +1,6 @@
 /*
-
 LRU Cache Simulator
 3/4/19
-
 Developers: Bruno E. Gracia Villalobos
 			Ryan Walker
 */
@@ -20,7 +18,7 @@ using namespace G;
 using namespace std;
 
 //Returns a 4 byte vector with the lowest index at the MSB
-vector<unsigned char> memBytes(unsigned int a) 
+/*vector<unsigned char> memBytes(unsigned int a) 
 {
 	int size = sizeof(a);
 	vector<unsigned char> address(sizeof(a));
@@ -53,7 +51,7 @@ unsigned char* bytes(unsigned int &a)
 	memcpy(ret, (unsigned char*)&a, sizeof(a));
 	
 	return ret;
-}
+}*/
 
 /*Reads in config file*/
 void readConfig(int& c, int& b, int& n) {
@@ -61,14 +59,19 @@ void readConfig(int& c, int& b, int& n) {
 	ifstream file;
 	string line;
 	size_t found;
-	
+	string file_name;
 	/*FLUSH COUT*/
 	cout << flush;
 	cout.flush();
 	cout << dec;
 	
+	cout<<"Enter name of file for cache parameters: ";
+	cin>>file_name;
+
+
 	/*Begin configuration file read*/
-	file.open("example.cfg", ios::in);
+//	file.open("example.cfg", ios::in);
+	file.open(file_name, ios::in);
 	
 	if (file.is_open())
 	{
