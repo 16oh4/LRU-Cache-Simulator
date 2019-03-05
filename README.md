@@ -13,15 +13,15 @@ The tag bits are compared against what is stored in the list, and if it is a mat
 
 Here is a brief showcase of how the LRU algorithm works (with arbitrary tags), with a cache of associativity = 4
 
-0x0040| 0x007C| 0x008D| 0x009C |
+0x0040|-0x007C|-0x008D|-0x009C-|
 
-LRU   |       |       | MRU    |
+LRU---|-------|-------|--------|
 
 If an incoming tag= 0x748A is a miss in the cache, then it will be updated in this spot:
 
-0x007C| 0x008D| 0x009C| 0x748A |
+0x007C|-0x008D|-0x009C|-0x748A-|
 
-LRU   |       |       | MRU    |
+LRU---|-------|-------|MRU-----|
 
 The remaining tags in the set will be shifted to towards the n=0 slot as they increase in their LRU'ness.
 
