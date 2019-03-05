@@ -27,3 +27,5 @@ Cache Size=16384
 Block Size=64
 Associativity=8
 HIT RATE: 0.853008
+
+![alt text](https://github.com/brunogracia/cachesimulator/cmd_screenshot.png)
