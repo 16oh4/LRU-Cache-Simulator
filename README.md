@@ -15,10 +15,15 @@ HIT RATE: 0.85424
 
 Cache Size=32768
 Block Size=64
-Associativity=4
+Associativity=2
 HIT RATE: 0.853662
 
 Cache Size=16384
 Block Size=64
-Associativity=4
-HIT RATE: 0.027724
+Associativity=2
+HIT RATE: 0.852278
+
+Cache Size=16384
+Block Size=64
+Associativity=8
+HIT RATE: 0.853008
