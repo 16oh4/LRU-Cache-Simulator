@@ -28,4 +28,6 @@ Block Size=64
 Associativity=8
 HIT RATE: 0.853008
 
+Sample Run: (Memory sizes are in bytes)
+
 ![alt text](https://github.com/brunogracia/cachesimulator/blob/master/cmd_screenshot.PNG)
