@@ -1,8 +1,6 @@
 /*
-
 LRU Cache Simulator
 3/4/19
-
 Developers: Bruno E. Gracia Villalobos
 			Ryan Walker
 */
@@ -231,8 +229,13 @@ namespace G
 	void Cache::readMemory() {
 		ifstream file;
 		string line;
-		
-		file.open("example.trc", ios::in);
+		string file_name;
+
+		cout<<"Enter name of file with memory addresses: ";
+		cin>>file_name;
+
+//		file.open("example.trc", ios::in);
+		file.open(file_name, ios::in);
 		
 		int j=0;
 		
