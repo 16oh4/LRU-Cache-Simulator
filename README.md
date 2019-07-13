@@ -1,7 +1,7 @@
 # cachesimulator
 https://github.com/brunogracia/cachesimulator/blob/master/README.md
 
-A C++ simulation of an LRU cache with a ~650000 memory address dump. Combination of lists and vectors were used to implement LRU Cache. Vectors were used to store the entire memory from the file with the memory addresses. The cache was created as a vector of lists, which simulated the sets. 
+A C++ simulation of an LRU cache with a ~695000 memory address dump. Combination of lists and vectors were used to implement LRU Cache. Vectors were used to store the entire memory from the file with the memory addresses. The cache was created as a vector of lists, which simulated the sets. 
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 
